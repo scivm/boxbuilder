@@ -1,0 +1,95 @@
+{
+  "builders": [
+    {
+      "headless": true,
+      "disk_size": 10140,
+      "shutdown_command": "echo '/sbin/halt -h -p' > shutdown.sh; echo 'vagrant'|sudo -S sh 'shutdown.sh'",
+      "ssh_port": 22,
+      "iso_url": "file:///opt/software/CentOS-5.9-x86_64-bin-DVD-1of2.iso",
+      "iso_checksum": "bb795391846e76a7071893cbdf6163c3",
+      "guest_os_type": "RedHat_64",
+      "type": "virtualbox",
+      "ssh_password": "vagrant",
+      "ssh_username": "vagrant",
+      "iso_checksum_type": "md5",
+      "http_directory": "http",
+      "virtualbox_version_file": ".vbox_version",
+      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+      "boot_command": [
+        "linux text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ],
+      "vm_name": "CentOS-5.9-x86_64",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "512"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "1"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--pae",
+          "on"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--ioapic",
+          "on"
+        ]
+      ],
+      "boot_wait": "10s",
+      "ssh_wait_timeout": "10000s"
+    },
+    {
+      "disk_size": 10140,
+      "shutdown_command": "echo '/sbin/halt -h -p' > shutdown.sh; echo 'vagrant'|sudo -S sh 'shutdown.sh'",
+      "ssh_port": 22,
+      "iso_url": "http://mirrors.kernel.org/centos/5.9/isos/x86_64/CentOS-5.9-x86_64-bin-DVD-1of2.iso",
+      "iso_checksum": "c8caaa18400dfde2065d8ef58eb9e9bf",
+      "guest_os_type": "RedHat_64",
+      "type": "vmware",
+      "ssh_password": "vagrant",
+      "vmx_data": {
+        "memsize": "512",
+        "numvcpus": "1",
+        "cpuid.coresPerSocket": "1"
+      },
+      "ssh_username": "vagrant",
+      "iso_checksum_type": "md5",
+      "http_directory": "http",
+      "boot_command": [
+        "linux text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "ssh_wait_timeout": "10000s"
+    }
+  ],
+  "provisioners": [
+    {
+      "scripts": [
+        "scripts/base.sh",
+        "scripts/vagrant.sh",
+        "scripts/virtualbox.sh",
+        "scripts/cleanup.sh"
+      ],
+      "type": "shell",
+      "override": {
+        "vmware": {
+          "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'"
+        },
+        "virtualbox": {
+          "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'"
+        }
+      }
+    }
+  ],
+  "post-processors": ["vagrant"]
+}
